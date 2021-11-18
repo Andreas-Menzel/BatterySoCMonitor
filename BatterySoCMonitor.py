@@ -17,16 +17,21 @@ parser.add_argument('-d', '--delay',
 parser.add_argument('-v', '--verbose',
     action='store_true',
     help='Print more information')
+parser.add_argument('--minimum_soc',
+    metavar='',
+    type=int,
+    default=5,
+    help='Terminate script when batteries state of charge is below or equal to this percentage')
+parser.add_argument('--maximum_soc',
+    metavar='',
+    type=int,
+    default=5,
+    help='Terminate script when batteries state of charge is above or equal to this percentage')
 args = parser.parse_args()
 
 
 def main():
     if args.verbose:
-        print('----------')
-        print('Script startet at:\t\t', datetime.now(), sep='')
-        print('delay between measurements:\t', args.delay, sep='')
-        print('----------')
-        print()
         print('<secs>      : seconds since script was started')
         print('<soc>       : batteries state of charge')
         print('<secs_left> : prediction on battery time left')
@@ -40,6 +45,16 @@ def main():
         state_of_charge = round(battery.percent, 2)
         seconds_left = round(battery.secsleft)
         print(round(time_now - time_start), state_of_charge, seconds_left, sep='\t')
+
+        if state_of_charge <= args.minimum_soc:
+            if args.verbose:
+                print('Batteries state of charge reached the minimum level. Terminating script.')
+            end(None, None)
+        if state_of_charge >= args.maximum_soc:
+            if args.verbose:
+                print('Batteries state of charge reached the maximum level. Terminating script.')
+            end(None, None)
+
         sleep(args.delay - (time_now - time_start) % args.delay) # execution time compensation
 
 def end(signal_received, frame):
@@ -49,3 +64,4 @@ def end(signal_received, frame):
 if __name__ == "__main__":
     signal(SIGINT, end)
     main()
+    end(None, None)
