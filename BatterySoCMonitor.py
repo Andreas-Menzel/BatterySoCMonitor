@@ -58,7 +58,8 @@ def main():
         sleep(args.delay - (time_now - time_start) % args.delay) # execution time compensation
 
 def end(signal_received, frame):
-    print('Goodbye!')
+    if args.verbose:
+        print('Goodbye!')
     exit(0)
 
 if __name__ == "__main__":
