@@ -11,7 +11,7 @@ from time import sleep, time
 
 # Setup argument parser
 parser = argparse.ArgumentParser(description='Simple python script that monitors the batteries state of charge', prog='BatterySoCMonitor')
-parser.add_argument('--version', action='version', version='%(prog)s v0.0.1')
+parser.add_argument('--version', action='version', version='%(prog)s v1.0.0')
 parser.add_argument('-d', '--delay',
     metavar='',
     type=int,
