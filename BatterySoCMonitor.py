@@ -25,7 +25,7 @@ parser.add_argument('--minimum_soc',
 parser.add_argument('--maximum_soc',
     metavar='',
     type=int,
-    default=5,
+    default=101,
     help='Terminate script when batteries state of charge is above or equal to this percentage')
 args = parser.parse_args()
 
