@@ -1,6 +1,7 @@
 import argparse
 from datetime import datetime
 from multiprocessing import Process
+import os
 import psutil
 from signal import signal, SIGINT
 from sys import exit
@@ -28,6 +29,12 @@ parser.add_argument('--maximum_soc',
     type=int,
     default=101,
     help='Terminate script when batteries state of charge is above or equal to this percentage')
+parser.add_argument('--cmd_start',
+    metavar='',
+    help='Command that will be executed when the script starts.')
+parser.add_argument('--cmd_end',
+    metavar='',
+    help='Command that will be executed when the script terminates.')
 parser.add_argument('-w', '--workers',
     nargs='+',
     choices=['cpuLoad'],
@@ -55,6 +62,10 @@ def main():
         print('<secs>\t<soc>\t<secs_left>')
 
     time_start = time()
+
+    # execute start command
+    if args.cmd_start != None:
+        os.system(args.cmd_start)
 
     # create and start worker thread(s)
     for w in args.workers:
@@ -88,6 +99,10 @@ def end(signal_received, frame):
     global worker_threads
     for wt in worker_threads:
         wt.terminate()
+
+    # execute end command
+    if args.cmd_end != None:
+        os.system(args.cmd_end)
 
     if args.verbose:
         print('Goodbye!')
