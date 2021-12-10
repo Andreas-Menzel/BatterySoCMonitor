@@ -101,6 +101,8 @@ def soc_to_human_form(soc):
         soc_str += '00%'
     elif soc_1 < 10:
         soc_str += str(soc_1) + '0%'
+    else:
+        soc_str += '%'
 
     return soc_str
 
