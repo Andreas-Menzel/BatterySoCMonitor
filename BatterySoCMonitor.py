@@ -16,16 +16,16 @@ parser.add_argument('-d', '--delay',
     metavar='',
     type=int,
     default=60,
-    help='Delay (in seconds) between each measurement.')
+    help='Delay (in seconds) between each measurement')
 parser.add_argument('-v', '--verbose',
     action='store_true',
     help='Print more information')
 parser.add_argument('-b', '--beautify',
     action='store_true',
-    help='Print information in human readable form.')
+    help='Print information in human readable form')
 parser.add_argument('-l', '--log_file',
     metavar='',
-    help='Filename of the log-file.')
+    help='Filename of the log-file')
 parser.add_argument('--minimum_soc',
     metavar='',
     type=int,
@@ -38,14 +38,14 @@ parser.add_argument('--maximum_soc',
     help='Terminate script when batteries state of charge is above or equal to this percentage')
 parser.add_argument('--cmd_start',
     metavar='',
-    help='Command that will be executed when the script starts.')
+    help='Command that will be executed when the script starts')
 parser.add_argument('--cmd_end',
     metavar='',
-    help='Command that will be executed when the script terminates.')
+    help='Command that will be executed when the script terminates')
 parser.add_argument('-w', '--workers',
     nargs='+',
     choices=['cpuLoad'],
-    help='Specify a list of worker jobs.')
+    help='Specify a list of worker jobs. Each worker creates a new process')
 args = parser.parse_args()
 
 
