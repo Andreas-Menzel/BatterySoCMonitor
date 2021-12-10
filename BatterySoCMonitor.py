@@ -82,21 +82,43 @@ def seconds_to_human_form(seconds):
     return hours_str  + ':' + minutes_str + ':' + seconds_str
 
 
+def soc_to_human_form(soc):
+    soc = round(soc, 2)
+    if soc < 10:
+        soc_str = '  '
+    elif soc < 100:
+        soc_str = ' '
+
+    soc_str += str(soc)
+
+    if ((soc - round(soc)) * 100) == 0:
+        soc_str += '.00'
+
+    soc_str += '%'
+
+    return soc_str
+
+
 def main():
     global worker_threads
-
-    if args.verbose:
-        print('<secs>      : seconds since script was started')
-        print('<soc>       : batteries state of charge')
-        print('<secs_left> : prediction on battery time left')
-        print()
-        print('<secs>\t<soc>\t<secs_left>')
-
-    time_start = time()
 
     # execute start command
     if args.cmd_start != None:
         os.system(args.cmd_start)
+
+    if args.verbose:
+        if args.beautify:
+            print('timeExecuted\tbat %\ttimeRemaining')
+            print('hh:mm:ss\t\thh:mm:ss')
+            print('---------\t-------\t---------')
+        else:
+            print('<secs>      : seconds since script was started')
+            print('<soc>       : batteries state of charge')
+            print('<secs_left> : prediction on battery time left')
+            print()
+            print('<secs>\t<soc>\t<secs_left>')
+
+    time_start = time()
 
     # create and start worker thread(s)
     if args.workers != None:
@@ -115,7 +137,7 @@ def main():
         time_executed = round(time_now - time_start)
 
         if args.beautify:
-            print(seconds_to_human_form(time_executed), state_of_charge, seconds_to_human_form(seconds_left), sep='\t')
+            print(seconds_to_human_form(time_executed), soc_to_human_form(state_of_charge), seconds_to_human_form(seconds_left), sep='\t')
         else:
             print(time_executed, state_of_charge, seconds_left, sep='\t')
 
