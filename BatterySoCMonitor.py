@@ -22,6 +22,9 @@ parser.add_argument('-v', '--verbose',
 parser.add_argument('-b', '--beautify',
     action='store_true',
     help='Print information in human readable form.')
+parser.add_argument('-l', '--log_file',
+    metavar='',
+    help='Filename of the log-file.')
 parser.add_argument('--minimum_soc',
     metavar='',
     type=int,
@@ -99,6 +102,26 @@ def soc_to_human_form(soc):
     return soc_str
 
 
+def myPrint(*strings, sep=' ', end='\n'):
+    combined_string = ''
+
+    if len(strings) > 1:
+        for i in range(0, len(strings) - 1):
+            combined_string += str(strings[i]) + sep
+
+
+    if len(strings) > 0:
+        combined_string += str(strings[-1]) + end
+    else:
+        combined_string += end
+
+    print(combined_string, end='')
+
+    if args.log_file != None:
+        with open(args.log_file, 'a+') as f:
+            f.write(combined_string)
+
+
 def main():
     global worker_threads
 
@@ -108,15 +131,15 @@ def main():
 
     if args.verbose:
         if args.beautify:
-            print('timeExecuted\tbat %\ttimeRemaining')
-            print('hh:mm:ss\t\thh:mm:ss')
-            print('---------\t-------\t---------')
+            myPrint('timeExecuted\tbat %\ttimeRemaining')
+            myPrint('hh:mm:ss\t\thh:mm:ss')
+            myPrint('---------\t-------\t---------')
         else:
-            print('<secs>      : seconds since script was started')
-            print('<soc>       : batteries state of charge')
-            print('<secs_left> : prediction on battery time left')
-            print()
-            print('<secs>\t<soc>\t<secs_left>')
+            myPrint('<secs>      : seconds since script was started')
+            myPrint('<soc>       : batteries state of charge')
+            myPrint('<secs_left> : prediction on battery time left')
+            myPrint()
+            myPrint('<secs>\t<soc>\t<secs_left>')
 
     time_start = time()
 
@@ -137,17 +160,17 @@ def main():
         time_executed = round(time_now - time_start)
 
         if args.beautify:
-            print(seconds_to_human_form(time_executed), soc_to_human_form(state_of_charge), seconds_to_human_form(seconds_left), sep='\t')
+            myPrint(seconds_to_human_form(time_executed), soc_to_human_form(state_of_charge), seconds_to_human_form(seconds_left), sep='\t')
         else:
-            print(time_executed, state_of_charge, seconds_left, sep='\t')
+            myPrint(time_executed, state_of_charge, seconds_left, sep='\t')
 
         if state_of_charge <= args.minimum_soc:
             if args.verbose:
-                print('Batteries state of charge reached the minimum level. Terminating script.')
+                myPrint('Batteries state of charge reached the minimum level. Terminating script.')
             end(None, None)
         if state_of_charge >= args.maximum_soc:
             if args.verbose:
-                print('Batteries state of charge reached the maximum level. Terminating script.')
+                myPrint('Batteries state of charge reached the maximum level. Terminating script.')
             end(None, None)
 
         sleep(args.delay - (time_now - time_start) % args.delay) # execution time compensation
@@ -164,7 +187,7 @@ def end(signal_received, frame):
         os.system(args.cmd_end)
 
     if args.verbose:
-        print('Goodbye!')
+        myPrint('Goodbye!')
     exit(0)
 
 
