@@ -62,14 +62,14 @@ def seconds_to_human_form(seconds):
     if seconds < 0:
         return '00:00:00?'
 
-    hours_int = round(seconds / 3600)
+    hours_int = floor(seconds / 3600)
     if hours_int < 10:
         hours_str = '0'
     else:
         hours_str = ''
     hours_str += str(hours_int)
 
-    minutes_int = round((seconds % 3600) / 60)
+    minutes_int = floor((seconds % 3600) / 60)
     if minutes_int < 10:
         minutes_str = '0'
     else:
