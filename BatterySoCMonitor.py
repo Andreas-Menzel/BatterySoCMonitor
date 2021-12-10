@@ -68,12 +68,13 @@ def main():
         os.system(args.cmd_start)
 
     # create and start worker thread(s)
-    for w in args.workers:
-        if w == 'cpuLoad':
-            worker_threads.append(Process(target=worker_cpuLoad))
+    if args.workers != None:
+        for w in args.workers:
+            if w == 'cpuLoad':
+                worker_threads.append(Process(target=worker_cpuLoad))
 
-    for wt in worker_threads:
-        wt.start()
+        for wt in worker_threads:
+            wt.start()
 
     while True:
         time_now = time()
