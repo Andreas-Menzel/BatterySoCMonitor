@@ -86,18 +86,21 @@ def seconds_to_human_form(seconds):
 
 
 def soc_to_human_form(soc):
-    soc = round(soc, 2)
-    if soc < 10:
-        soc_str = '  '
-    elif soc < 100:
-        soc_str = ' '
+    soc_0 = int(soc)
+    soc_1 = int((soc - soc_0) * 100)
 
-    soc_str += str(soc)
+    soc_str = ''
+    if soc_0 < 10:
+        soc_str += '  '
+    elif soc_0 < 100:
+        soc_str += ' '
 
-    if ((soc - round(soc)) * 100) == 0:
-        soc_str += '.00'
+    soc_str += str(soc_0) + '.' + str(soc_1)
 
-    soc_str += '%'
+    if soc_1 == 0:
+        soc_str += '00%'
+    elif soc_1 < 10:
+        soc_str += str(soc_1) + '0%'
 
     return soc_str
 
