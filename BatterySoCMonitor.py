@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+from multiprocessing import Process
 import psutil
 from signal import signal, SIGINT
 from sys import exit
@@ -27,10 +28,25 @@ parser.add_argument('--maximum_soc',
     type=int,
     default=101,
     help='Terminate script when batteries state of charge is above or equal to this percentage')
+parser.add_argument('-w', '--workers',
+    nargs='+',
+    choices=['cpuLoad'],
+    help='Specify a list of worker jobs.')
 args = parser.parse_args()
 
 
+worker_threads = []
+
+
+def worker_cpuLoad():
+    x = 123
+    while True:
+        x*x
+
+
 def main():
+    global worker_threads
+
     if args.verbose:
         print('<secs>      : seconds since script was started')
         print('<soc>       : batteries state of charge')
@@ -39,6 +55,15 @@ def main():
         print('<secs>\t<soc>\t<secs_left>')
 
     time_start = time()
+
+    # create and start worker thread(s)
+    for w in args.workers:
+        if w == 'cpuLoad':
+            worker_threads.append(Process(target=worker_cpuLoad))
+
+    for wt in worker_threads:
+        wt.start()
+
     while True:
         time_now = time()
         battery = psutil.sensors_battery()
@@ -57,10 +82,17 @@ def main():
 
         sleep(args.delay - (time_now - time_start) % args.delay) # execution time compensation
 
+
 def end(signal_received, frame):
+    # stop all worker threads
+    global worker_threads
+    for wt in worker_threads:
+        wt.terminate()
+
     if args.verbose:
         print('Goodbye!')
     exit(0)
+
 
 if __name__ == "__main__":
     signal(SIGINT, end)
