@@ -19,6 +19,9 @@ parser.add_argument('-d', '--delay',
 parser.add_argument('-v', '--verbose',
     action='store_true',
     help='Print more information')
+parser.add_argument('-b', '--beautify',
+    action='store_true',
+    help='Print information in human readable form.')
 parser.add_argument('--minimum_soc',
     metavar='',
     type=int,
@@ -51,6 +54,34 @@ def worker_cpuLoad():
         x*x
 
 
+def seconds_to_human_form(seconds):
+    if seconds < 0:
+        return '00:00:00?'
+
+    hours_int = round(seconds / 3600)
+    if hours_int < 10:
+        hours_str = '0'
+    else:
+        hours_str = ''
+    hours_str += str(hours_int)
+
+    minutes_int = round((seconds % 3600) / 60)
+    if minutes_int < 10:
+        minutes_str = '0'
+    else:
+        minutes_str = ''
+    minutes_str += str(minutes_int)
+
+    seconds_int = (seconds % 3600) % 60
+    if seconds_int < 10:
+        seconds_str = '0'
+    else:
+        seconds_str = ''
+    seconds_str += str(seconds_int)
+
+    return hours_str  + ':' + minutes_str + ':' + seconds_str
+
+
 def main():
     global worker_threads
 
@@ -81,7 +112,12 @@ def main():
         battery = psutil.sensors_battery()
         state_of_charge = round(battery.percent, 2)
         seconds_left = round(battery.secsleft)
-        print(round(time_now - time_start), state_of_charge, seconds_left, sep='\t')
+        time_executed = round(time_now - time_start)
+
+        if args.beautify:
+            print(seconds_to_human_form(time_executed), state_of_charge, seconds_to_human_form(seconds_left), sep='\t')
+        else:
+            print(time_executed, state_of_charge, seconds_left, sep='\t')
 
         if state_of_charge <= args.minimum_soc:
             if args.verbose:
