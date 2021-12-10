@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+from math import floor
 from multiprocessing import Process
 import os
 import psutil
@@ -86,7 +87,7 @@ def seconds_to_human_form(seconds):
 
 
 def soc_to_human_form(soc):
-    soc_0 = int(soc)
+    soc_0 = floor(soc)
     soc_1 = int((soc - soc_0) * 100)
 
     soc_str = ''
@@ -97,10 +98,8 @@ def soc_to_human_form(soc):
 
     soc_str += str(soc_0) + '.' + str(soc_1)
 
-    if soc_1 == 0:
-        soc_str += '00%'
-    elif soc_1 < 10:
-        soc_str += str(soc_1) + '0%'
+    if soc_1 < 10:
+        soc_str += '0%'
     else:
         soc_str += '%'
 
