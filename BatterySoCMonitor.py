@@ -8,7 +8,7 @@ from signal import signal, SIGINT
 from sys import exit
 from time import sleep, strftime, time, localtime
 
-script_version = '1.0.0'
+script_version = '1.1.0'
 
 # Setup argument parser
 parser = argparse.ArgumentParser(description='Simple python script that monitors the batteries state of charge', prog='BatterySoCMonitor')
