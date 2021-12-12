@@ -30,12 +30,12 @@ parser.add_argument('-l', '--log_file',
 parser.add_argument('--minimum_soc',
     metavar='',
     type=int,
-    default=5,
+    default=None,
     help='Terminate script when batteries state of charge is below or equal to this percentage')
 parser.add_argument('--maximum_soc',
     metavar='',
     type=int,
-    default=101,
+    default=None,
     help='Terminate script when batteries state of charge is above or equal to this percentage')
 parser.add_argument('--cmd_start',
     metavar='',
@@ -206,11 +206,11 @@ def main():
         else:
             myPrint(time_executed, state_of_charge, seconds_left, sep='\t')
 
-        if state_of_charge <= args.minimum_soc:
+        if args.minimum_soc != None and state_of_charge <= args.minimum_soc:
             if args.verbose:
                 myPrint('Batteries state of charge reached the minimum level. Terminating script.')
             end(None, None)
-        if state_of_charge >= args.maximum_soc:
+        if args.maximum_soc != None and state_of_charge >= args.maximum_soc:
             if args.verbose:
                 myPrint('Batteries state of charge reached the maximum level. Terminating script.')
             end(None, None)
