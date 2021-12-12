@@ -6,7 +6,7 @@ import os
 import psutil
 from signal import signal, SIGINT
 from sys import exit
-from time import sleep, time
+from time import sleep, strftime, time, localtime
 
 script_version = '1.0.0'
 
@@ -51,6 +51,12 @@ args = parser.parse_args()
 
 
 worker_threads = []
+time_start = None
+time_end = None
+battery_soc_start = None
+battery_soc_end = None
+expected_remaining_time_start = None
+expected_remaining_time_end = None
 
 
 def worker_cpuLoad():
@@ -129,6 +135,13 @@ def myPrint(*strings, sep=' ', end='\n'):
 
 def main():
     global worker_threads
+    global time_start
+    global battery_soc_start
+    global expected_remaining_time_start
+
+    time_start = time()
+    battery_soc_start = round(psutil.sensors_battery().percent)
+    expected_remaining_time_start = round(psutil.sensors_battery().secsleft)
 
     # execute start command
     if args.cmd_start != None:
@@ -206,6 +219,17 @@ def main():
 
 
 def end(signal_received, frame):
+    global time_start
+    global time_end
+    global battery_soc_start
+    global battery_soc_end
+    global expected_remaining_time_start
+    global expected_remaining_time_end
+
+    battery_soc_end = round(psutil.sensors_battery().percent)
+    expected_remaining_time_end = round(psutil.sensors_battery().secsleft)
+    time_end = time()
+
     # stop all worker threads
     global worker_threads
     for wt in worker_threads:
@@ -214,6 +238,21 @@ def end(signal_received, frame):
     # execute end command
     if args.cmd_end != None:
         os.system(args.cmd_end)
+
+    if args.beautify:
+        myPrint()
+        myPrint('# Script started at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_start)), end=' ')
+        myPrint('with ', battery_soc_start, '% and expected runtime of ', seconds_to_human_form(expected_remaining_time_start), '.', sep='')
+
+        myPrint('# Script terminated at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_end)), end=' ')
+        myPrint('with ', battery_soc_end, '% and expected runtime of ', seconds_to_human_form(expected_remaining_time_end), '.', sep='')
+    else:
+        myPrint('# script_startet_at', floor(time_start), sep='\t')
+        myPrint('# script_terminated_at', floor(time_end), sep='\t')
+        myPrint('# soc_start', battery_soc_start, sep='\t')
+        myPrint('# soc_end', battery_soc_end, sep='\t')
+        myPrint('# expected_remaining_time_start', expected_remaining_time_start, sep='\t')
+        myPrint('# expected_remaining_time_end', expected_remaining_time_end, sep='\t')
 
     if args.verbose:
         myPrint('Goodbye!')
