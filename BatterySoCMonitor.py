@@ -8,10 +8,11 @@ from signal import signal, SIGINT
 from sys import exit
 from time import sleep, time
 
+script_version = '1.0.0'
 
 # Setup argument parser
 parser = argparse.ArgumentParser(description='Simple python script that monitors the batteries state of charge', prog='BatterySoCMonitor')
-parser.add_argument('--version', action='version', version='%(prog)s v1.0.0')
+parser.add_argument('--version', action='version', version='%(prog)s ' + script_version)
 parser.add_argument('-d', '--delay',
     metavar='',
     type=int,
