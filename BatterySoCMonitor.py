@@ -37,6 +37,12 @@ parser.add_argument('--maximum_soc',
     type=int,
     default=None,
     help='Terminate script when batteries state of charge is above or equal to this percentage')
+parser.add_argument('--cmd_min_soc',
+    metavar='',
+    help='Command that will be executed when the script terminates because of the batteries state of charge (see --minimum_soc)')
+parser.add_argument('--cmd_max_soc',
+    metavar='',
+    help='Command that will be executed when the script terminates because of the batteries state of charge (see --maximum_soc)')
 parser.add_argument('--cmd_start',
     metavar='',
     help='Command that will be executed when the script starts')
@@ -235,6 +241,12 @@ def end(signal_received, frame):
     for wt in worker_threads:
         wt.terminate()
 
+    # execute min_soc command
+    if args.cmd_min_soc != None:
+        os.system(args.cmd_min_soc)
+    # execute max_soc command
+    if args.cmd_max_soc != None:
+        os.system(args.cmd_max_soc)
     # execute end command
     if args.cmd_end != None:
         os.system(args.cmd_end)
