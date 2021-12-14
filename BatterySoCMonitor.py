@@ -13,11 +13,16 @@ script_version = '1.1.0'
 # Setup argument parser
 parser = argparse.ArgumentParser(description='Simple python script that monitors the batteries state of charge', prog='BatterySoCMonitor')
 parser.add_argument('--version', action='version', version='%(prog)s ' + script_version)
-parser.add_argument('-d', '--delay',
+parser.add_argument('--sample_rate',
+    metavar='',
+    type=int,
+    default=10,
+    help='Delay (in seconds) between each measurement')
+parser.add_argument('--output_rate',
     metavar='',
     type=int,
     default=60,
-    help='Delay (in seconds) between each measurement')
+    help='Delay (in seconds) between each data output')
 parser.add_argument('-v', '--verbose',
     action='store_true',
     help='Print more information')
@@ -155,7 +160,8 @@ def main():
 
     if args.beautify:
         myPrint('### BatterySoCMonitor version', script_version)
-        myPrint('# delay', '\t\t', ':\t', args.delay, sep='')
+        myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
+        myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
         myPrint('# verbose', '\t', ':\t', args.verbose, sep='')
         myPrint('# beautify', '\t', ':\t', args.beautify, sep='')
         myPrint('# log_file', '\t', ':\t', args.log_file, sep='')
@@ -166,7 +172,8 @@ def main():
         myPrint('# workers', '\t', ':\t', args.workers, sep='')
     else:
         myPrint('### BatterySoCMonitor version', script_version)
-        myPrint('# delay', ':', args.delay, sep='\t')
+        myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
+        myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
         myPrint('# verbose', ':', args.verbose, sep='\t')
         myPrint('# beautify', ':', args.beautify, sep='\t')
         myPrint('# log_file', ':', args.log_file, sep='\t')
@@ -200,6 +207,7 @@ def main():
         for wt in worker_threads:
             wt.start()
 
+    sample_counter = 0
     while True:
         time_now = time()
         battery = psutil.sensors_battery()
@@ -207,11 +215,16 @@ def main():
         seconds_left = round(battery.secsleft)
         time_executed = round(time_now - time_start)
 
-        if args.beautify:
-            myPrint(seconds_to_human_form(time_executed), soc_to_human_form(state_of_charge), seconds_to_human_form(seconds_left), sep='\t')
-        else:
-            myPrint(time_executed, state_of_charge, seconds_left, sep='\t')
+        # save data
 
+        # print data (to console [and file])
+        if sample_counter % (args.output_rate / args.sample_rate) == 0:
+            if args.beautify:
+                myPrint(seconds_to_human_form(time_executed), soc_to_human_form(state_of_charge), seconds_to_human_form(seconds_left), sep='\t')
+            else:
+                myPrint(time_executed, state_of_charge, seconds_left, sep='\t')
+
+        # check if minimum_soc or maximum_soc is reached
         if args.minimum_soc != None and state_of_charge <= args.minimum_soc:
             if args.verbose:
                 myPrint('Batteries state of charge reached the minimum level. Terminating script.')
@@ -221,7 +234,9 @@ def main():
                 myPrint('Batteries state of charge reached the maximum level. Terminating script.')
             end(None, None)
 
-        sleep(args.delay - (time_now - time_start) % args.delay) # execution time compensation
+        sleep(args.sample_rate - (time_now - time_start) % args.sample_rate) # execution time compensation
+
+        sample_counter += 1
 
 
 def end(signal_received, frame):
