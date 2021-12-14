@@ -69,6 +69,9 @@ battery_soc_end = None
 expected_remaining_time_start = None
 expected_remaining_time_end = None
 
+data_soc = []
+data_secsleft = []
+
 
 def worker_cpuLoad():
     x = 123
@@ -216,13 +219,19 @@ def main():
         time_executed = round(time_now - time_start)
 
         # save data
+        data_soc.append(state_of_charge)
+        data_secsleft.append(seconds_left)
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
             if args.beautify:
-                myPrint(seconds_to_human_form(time_executed), soc_to_human_form(state_of_charge), seconds_to_human_form(seconds_left), sep='\t')
+                myPrint(seconds_to_human_form(time_executed), end='\t')
+                myPrint(soc_to_human_form(state_of_charge), end='\t')
+                myPrint(seconds_to_human_form(seconds_left))
             else:
-                myPrint(time_executed, state_of_charge, seconds_left, sep='\t')
+                myPrint(time_executed, end='\t')
+                myPrint(state_of_charge, end='\t')
+                myPrint(seconds_left)
 
         # check if minimum_soc or maximum_soc is reached
         if args.minimum_soc != None and state_of_charge <= args.minimum_soc:
