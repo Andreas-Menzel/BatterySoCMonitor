@@ -17,12 +17,10 @@ parser.add_argument('--version', action='version', version='%(prog)s ' + script_
 parser.add_argument('--sample_rate',
     metavar='',
     type=int,
-    default=10,
     help='Delay (in seconds) between each measurement')
 parser.add_argument('--output_rate',
     metavar='',
     type=int,
-    default=60,
     help='Delay (in seconds) between each data output')
 parser.add_argument('-v', '--verbose',
     action='store_true',
@@ -165,6 +163,15 @@ def main():
     global data_soc
     global data_secsleft
     global data_median_consumption
+
+    # Initialize sample_rate and output_rate
+    if args.sample_rate == None and args.output_rate == None:
+        args.sample_rate = 10
+        args.output_rate = 10
+    elif args.sample_rate == None and args.output_rate != None:
+        args.sample_rate = args.output_rate
+    elif args.sample_rate != None and args.output_rate == None:
+        args.output_rate = args.sample_rate
 
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
