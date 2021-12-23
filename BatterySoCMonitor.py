@@ -6,6 +6,7 @@ import os
 import psutil
 from signal import signal, SIGINT
 from sys import exit
+import sys
 from time import sleep, strftime, time, localtime
 
 script_version = '1.1.0'
@@ -71,6 +72,7 @@ expected_remaining_time_end = None
 
 data_soc = []
 data_secsleft = []
+data_median_consumption = []
 
 
 def worker_cpuLoad():
@@ -107,7 +109,7 @@ def seconds_to_human_form(seconds):
     return hours_str  + ':' + minutes_str + ':' + seconds_str
 
 
-def soc_to_human_form(soc):
+def percentage_to_human_form(soc):
     soc_0 = floor(soc)
     soc_1 = int((soc - soc_0) * 100)
 
@@ -152,6 +154,9 @@ def main():
     global time_start
     global battery_soc_start
     global expected_remaining_time_start
+    global data_soc
+    global data_secsleft
+    global data_median_consumption
 
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
@@ -217,25 +222,37 @@ def main():
         state_of_charge = round(battery.percent, 2)
         seconds_left = round(battery.secsleft)
         time_executed = round(time_now - time_start)
+        consumption = -1 # consumption in (% / s)
+        if sample_counter > 0:
+            consumption = (data_soc[0] - data_soc[-1]) / (time_executed / (60*60))
+            consumption = round(consumption, 2)
 
         # save data
         data_soc.append(state_of_charge)
         data_secsleft.append(seconds_left)
+        data_median_consumption.append(consumption)
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
+            # clear previous output
+            sys.stdout.write("\033[F") # Cursor up one line
+            sys.stdout.write("\033[K") # Clear to the end of line
             if args.beautify:
                 myPrint(seconds_to_human_form(time_executed), end='\t')
-                myPrint(soc_to_human_form(state_of_charge), end='\t')
-                myPrint(seconds_to_human_form(seconds_left))
+                myPrint(percentage_to_human_form(state_of_charge), end='\t')
+                myPrint(seconds_to_human_form(seconds_left), end='\t')
+                myPrint(percentage_to_human_form(consumption), '/ h')
             else:
                 myPrint(time_executed, end='\t')
                 myPrint(state_of_charge, end='\t')
-                myPrint(seconds_left)
+                myPrint(seconds_left, end='\t')
+                myPrint(consumption)
 
         # check if minimum_soc or maximum_soc is reached
         if args.minimum_soc != None and state_of_charge <= args.minimum_soc:
             if args.verbose:
+                myPrint("Consumption:", (data_soc[0] - data_soc[-1]) / time_executed)
+                myPrint("Consumption:", sum(data_median_consumption) / len(data_median_consumption))
                 myPrint('Batteries state of charge reached the minimum level. Terminating script.')
             end(None, None)
         if args.maximum_soc != None and state_of_charge >= args.maximum_soc:
