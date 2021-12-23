@@ -69,7 +69,7 @@ battery_soc_start = None
 battery_soc_end = None
 expected_remaining_time_start = None
 expected_remaining_time_end = None
-median_consumption_start = None
+median_consumption_start = 0
 median_consumption_end = None
 
 data_soc = []
@@ -169,7 +169,6 @@ def main():
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
     expected_remaining_time_start = round(psutil.sensors_battery().secsleft)
-    median_consumption_start = 0
 
     # execute start command
     if args.cmd_start != None:
@@ -234,6 +233,9 @@ def main():
         if sample_counter > 0:
             consumption = (data_soc[0] - data_soc[-1]) / (time_executed / (60*60))
             consumption = round(consumption, 2)
+
+        if median_consumption_start == 0 and consumption != 0 and consumption != -1:
+            median_consumption_start = consumption
 
         # save data
         data_soc.append(state_of_charge)
