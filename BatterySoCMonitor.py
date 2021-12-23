@@ -17,11 +17,11 @@ parser.add_argument('--version', action='version', version='%(prog)s ' + script_
 parser.add_argument('--sample_rate',
     metavar='',
     type=int,
-    help='Delay (in seconds) between each measurement')
+    help='Delay (in seconds) between each measurement. Must be a divisor of --output_rate')
 parser.add_argument('--output_rate',
     metavar='',
     type=int,
-    help='Delay (in seconds) between each data output')
+    help='Delay (in seconds) between each data output. Must be a multiple of --sample_rate')
 parser.add_argument('-v', '--verbose',
     action='store_true',
     help='Print more information')
@@ -175,6 +175,7 @@ def main():
     else:
         if args.output_rate % args.sample_rate != 0:
             myPrint('ERROR: --output_rate must be a multiple of --sample_rate')
+            end_error()
 
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
@@ -280,6 +281,9 @@ def main():
 
         sample_counter += 1
 
+
+def end_error():
+    exit(1)
 
 def end(signal_received, frame):
     global time_start
