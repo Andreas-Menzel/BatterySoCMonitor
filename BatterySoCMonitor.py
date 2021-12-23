@@ -109,24 +109,24 @@ def seconds_to_human_form(seconds):
     return hours_str  + ':' + minutes_str + ':' + seconds_str
 
 
-def percentage_to_human_form(soc):
-    soc_0 = floor(soc)
-    soc_1 = int((soc - soc_0) * 100)
+def percentage_to_human_form(percent):
+    percent_0 = floor(percent)
+    percent_1 = int((percent - percent_0) * 100)
 
-    soc_str = ''
-    if soc_0 < 10:
-        soc_str += '  '
-    elif soc_0 < 100:
-        soc_str += ' '
+    percent_str = ''
+    if percent_0 < 10:
+        percent_str += '  '
+    elif percent_0 < 100:
+        percent_str += ' '
 
-    soc_str += str(soc_0) + '.' + str(soc_1)
+    percent_str += str(percent_0) + '.' + str(percent_1)
 
-    if soc_1 < 10:
-        soc_str += '0%'
+    if percent_1 < 10:
+        percent_str += '0%'
     else:
-        soc_str += '%'
+        percent_str += '%'
 
-    return soc_str
+    return percent_str
 
 
 def myPrint(*strings, sep=' ', end='\n'):
