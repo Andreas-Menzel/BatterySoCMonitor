@@ -172,6 +172,9 @@ def main():
         args.sample_rate = args.output_rate
     elif args.sample_rate != None and args.output_rate == None:
         args.output_rate = args.sample_rate
+    else:
+        if args.output_rate % args.sample_rate != 0:
+            myPrint('ERROR: --output_rate must be a multiple of --sample_rate')
 
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
