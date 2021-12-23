@@ -7,7 +7,7 @@ Simple Python script that monitors the batteries state of charge.
 - monitor the batteries state of charge at 1 minute intervals
 - display all information in human readable form
 ```
-python BatterySoCMonitor.py -d 60 -v -b
+python BatterySoCMonitor.py --sample_rate 60 -v -b
 ```
 
 ### Monitor with CPU load
@@ -16,7 +16,7 @@ python BatterySoCMonitor.py -d 60 -v -b
 - save results in log file (`battery_soc.log`)
 - create 4 threads with 100% CPU-usage
 ```
-python BatterySoCMonitor.py -d 60 -v -b --log_file battery_soc.log --workers cpuLoad cpuLoad cpuLoad cpuLoad
+python BatterySoCMonitor.py --sample_rate 60 -v -b --log_file battery_soc.log --workers cpuLoad cpuLoad cpuLoad cpuLoad
 ```
 
 ### Overnight test
@@ -25,5 +25,5 @@ python BatterySoCMonitor.py -d 60 -v -b --log_file battery_soc.log --workers cpu
 - save results in log file (`battery_soc.log`)
 - terminate script and shutdown system at 10%
 ```
-python BatterySoCMonitor.py -d 60 -v -b --log_file battery_soc.log --minimum_soc 10 --cmd_end 'shutdown now'
+python BatterySoCMonitor.py --sample_rate 60 -v -b --log_file battery_soc.log --minimum_soc 10 --cmd_end 'shutdown now'
 ```
