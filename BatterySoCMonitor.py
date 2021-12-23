@@ -196,7 +196,7 @@ def main():
     if args.beautify:
         myPrint()
         myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption')
-        myPrint('hh:mm:ss\t\thh:mm:ss')
+        myPrint('hh:mm:ss\t\thh:mm:ss\t(median)')
         myPrint('---------\t-------\t---------\t-----------')
     else:
         myPrint()
