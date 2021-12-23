@@ -166,43 +166,41 @@ def main():
     if args.cmd_start != None:
         os.system(args.cmd_start)
 
-    if args.beautify:
-        myPrint('### BatterySoCMonitor version', script_version)
-        myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
-        myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
-        myPrint('# verbose', '\t', ':\t', args.verbose, sep='')
-        myPrint('# beautify', '\t', ':\t', args.beautify, sep='')
-        myPrint('# log_file', '\t', ':\t', args.log_file, sep='')
-        myPrint('# minimum_soc', '\t', ':\t', args.minimum_soc, sep='')
-        myPrint('# maximum_soc', '\t', ':\t', args.maximum_soc, sep='')
-        myPrint('# cmd_start', '\t', ':\t', args.cmd_start, sep='')
-        myPrint('# cmd_end', '\t', ':\t', args.cmd_end, sep='')
-        myPrint('# workers', '\t', ':\t', args.workers, sep='')
-    else:
-        myPrint('### BatterySoCMonitor version', script_version)
-        myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
-        myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
-        myPrint('# verbose', ':', args.verbose, sep='\t')
-        myPrint('# beautify', ':', args.beautify, sep='\t')
-        myPrint('# log_file', ':', args.log_file, sep='\t')
-        myPrint('# minimum_soc', ':', args.minimum_soc, sep='\t')
-        myPrint('# maximum_soc', ':', args.maximum_soc, sep='\t')
-        myPrint('# cmd_start', ':', args.cmd_start, sep='\t')
-        myPrint('# cmd_end', ':', args.cmd_end, sep='\t')
-        myPrint('# workers', ':', args.workers, sep='\t')
+    myPrint('# Welcome to BatterySoCMonitor version ', script_version, '!', sep='')
 
+    # print parameter values
     if args.verbose:
         if args.beautify:
-            myPrint()
-            myPrint('timeExecuted\tbat %\ttimeRemaining')
-            myPrint('hh:mm:ss\t\thh:mm:ss')
-            myPrint('---------\t-------\t---------')
+            myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
+            myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
+            myPrint('# verbose', '\t', ':\t', args.verbose, sep='')
+            myPrint('# beautify', '\t', ':\t', args.beautify, sep='')
+            myPrint('# log_file', '\t', ':\t', args.log_file, sep='')
+            myPrint('# minimum_soc', '\t', ':\t', args.minimum_soc, sep='')
+            myPrint('# maximum_soc', '\t', ':\t', args.maximum_soc, sep='')
+            myPrint('# cmd_start', '\t', ':\t', args.cmd_start, sep='')
+            myPrint('# cmd_end', '\t', ':\t', args.cmd_end, sep='')
+            myPrint('# workers', '\t', ':\t', args.workers, sep='')
         else:
-            myPrint('<secs>      : seconds since script was started')
-            myPrint('<soc>       : batteries state of charge')
-            myPrint('<secs_left> : prediction on battery time left')
-            myPrint()
-            myPrint('<secs>\t<soc>\t<secs_left>')
+            myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
+            myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
+            myPrint('# verbose', ':', args.verbose, sep='\t')
+            myPrint('# beautify', ':', args.beautify, sep='\t')
+            myPrint('# log_file', ':', args.log_file, sep='\t')
+            myPrint('# minimum_soc', ':', args.minimum_soc, sep='\t')
+            myPrint('# maximum_soc', ':', args.maximum_soc, sep='\t')
+            myPrint('# cmd_start', ':', args.cmd_start, sep='\t')
+            myPrint('# cmd_end', ':', args.cmd_end, sep='\t')
+            myPrint('# workers', ':', args.workers, sep='\t')
+
+    if args.beautify:
+        myPrint()
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption')
+        myPrint('hh:mm:ss\t\thh:mm:ss')
+        myPrint('---------\t-------\t---------\t-----------')
+    else:
+        myPrint()
+        myPrint('# <sec>\t<soc>\t<until>\t<consumption>')
 
     time_start = time()
 
@@ -215,6 +213,7 @@ def main():
         for wt in worker_threads:
             wt.start()
 
+    print('# Please open an issue on Github if the script is not starting.')
     sample_counter = 0
     while True:
         time_now = time()
