@@ -69,6 +69,8 @@ battery_soc_start = None
 battery_soc_end = None
 expected_remaining_time_start = None
 expected_remaining_time_end = None
+median_consumption_start = None
+median_consumption_end = None
 
 data_soc = []
 data_secsleft = []
@@ -149,11 +151,17 @@ def myPrint(*strings, sep=' ', end='\n'):
             f.write(combined_string)
 
 
+def clear_previous_line():
+    sys.stdout.write("\033[F") # Cursor up one line
+    sys.stdout.write("\033[K") # Clear to the end of line
+
+
 def main():
     global worker_threads
     global time_start
     global battery_soc_start
     global expected_remaining_time_start
+    global median_consumption_start
     global data_soc
     global data_secsleft
     global data_median_consumption
@@ -161,6 +169,7 @@ def main():
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
     expected_remaining_time_start = round(psutil.sensors_battery().secsleft)
+    median_consumption_start = 0
 
     # execute start command
     if args.cmd_start != None:
@@ -213,7 +222,7 @@ def main():
         for wt in worker_threads:
             wt.start()
 
-    print('# Please open an issue on Github if the script is not starting.')
+    myPrint('# Please open an issue on Github if the script is not starting.')
     sample_counter = 0
     while True:
         time_now = time()
@@ -233,9 +242,7 @@ def main():
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
-            # clear previous output
-            sys.stdout.write("\033[F") # Cursor up one line
-            sys.stdout.write("\033[K") # Clear to the end of line
+            clear_previous_line()
             if args.beautify:
                 myPrint(seconds_to_human_form(time_executed), end='\t')
                 myPrint(percentage_to_human_form(state_of_charge), end='\t')
@@ -250,11 +257,11 @@ def main():
         # check if minimum_soc or maximum_soc is reached
         if args.minimum_soc != None and state_of_charge <= args.minimum_soc:
             if args.verbose:
-                myPrint('Batteries state of charge reached the minimum level. Terminating script.')
+                myPrint('# Batteries state of charge reached the minimum level. Terminating script.')
             end(None, None)
         if args.maximum_soc != None and state_of_charge >= args.maximum_soc:
             if args.verbose:
-                myPrint('Batteries state of charge reached the maximum level. Terminating script.')
+                myPrint('# Batteries state of charge reached the maximum level. Terminating script.')
             end(None, None)
 
         sleep(args.sample_rate - (time_now - time_start) % args.sample_rate) # execution time compensation
@@ -269,10 +276,13 @@ def end(signal_received, frame):
     global battery_soc_end
     global expected_remaining_time_start
     global expected_remaining_time_end
+    global median_consumption_start
+    global median_consumption_end
 
     battery_soc_end = round(psutil.sensors_battery().percent)
     expected_remaining_time_end = round(psutil.sensors_battery().secsleft)
     time_end = time()
+    median_consumption_end = round((data_soc[0] - data_soc[-1]) / ((time_end - time_start) / (60*60)), 2)
 
     # stop all worker threads
     global worker_threads
@@ -290,19 +300,51 @@ def end(signal_received, frame):
         os.system(args.cmd_end)
 
     if args.beautify:
-        myPrint()
-        myPrint('# Script started at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_start)), end=' ')
-        myPrint('with ', battery_soc_start, '% and expected runtime of ', seconds_to_human_form(expected_remaining_time_start), '.', sep='')
+        # Remove old output
+        clear_previous_line()
+        clear_previous_line()
+        clear_previous_line()
+        clear_previous_line()
 
-        myPrint('# Script terminated at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_end)), end=' ')
-        myPrint('with ', battery_soc_end, '% and expected runtime of ', seconds_to_human_form(expected_remaining_time_end), '.', sep='')
+        myPrint('# Script started at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_start)), 'with the following values:')
+        myPrint()
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption')
+        myPrint('hh:mm:ss\t\thh:mm:ss\t(median)')
+        myPrint('---------\t-------\t---------\t-----------')
+        myPrint(seconds_to_human_form(0), end='\t')
+        myPrint(percentage_to_human_form(battery_soc_start), end='\t')
+        myPrint(seconds_to_human_form(expected_remaining_time_start), end='\t')
+        myPrint(percentage_to_human_form(median_consumption_start), '/ h')
+
+        myPrint()
+
+        myPrint('# Script terminated at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_end)), 'with the following values:')
+        myPrint()
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption')
+        myPrint('hh:mm:ss\t\thh:mm:ss\t(median)')
+        myPrint('---------\t-------\t---------\t-----------')
+        myPrint(seconds_to_human_form(round(time_end - time_start)), end='\t')
+        myPrint(percentage_to_human_form(battery_soc_end), end='\t')
+        myPrint(seconds_to_human_form(expected_remaining_time_end), end='\t')
+        myPrint(percentage_to_human_form(median_consumption_end), '/ h')
     else:
+        # Remove old output
+        clear_previous_line()
+        clear_previous_line()
+
         myPrint('# script_startet_at', floor(time_start), sep='\t')
+        myPrint('# <sec>\t<soc>\t<until>\t<consumption>')
+        myPrint(0, end='\t')
+        myPrint(battery_soc_start, end='\t')
+        myPrint(expected_remaining_time_start, end='\t')
+        myPrint(median_consumption_start)
+
         myPrint('# script_terminated_at', floor(time_end), sep='\t')
-        myPrint('# soc_start', battery_soc_start, sep='\t')
-        myPrint('# soc_end', battery_soc_end, sep='\t')
-        myPrint('# expected_remaining_time_start', expected_remaining_time_start, sep='\t')
-        myPrint('# expected_remaining_time_end', expected_remaining_time_end, sep='\t')
+        myPrint('# <sec>\t<soc>\t<until>\t<consumption>')
+        myPrint(round(time_end - time_start), end='\t')
+        myPrint(battery_soc_end, end='\t')
+        myPrint(expected_remaining_time_end, end='\t')
+        myPrint(median_consumption_end)
 
     if args.verbose:
         myPrint('Goodbye!')
