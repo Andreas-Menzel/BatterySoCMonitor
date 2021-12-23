@@ -251,8 +251,6 @@ def main():
         # check if minimum_soc or maximum_soc is reached
         if args.minimum_soc != None and state_of_charge <= args.minimum_soc:
             if args.verbose:
-                myPrint("Consumption:", (data_soc[0] - data_soc[-1]) / time_executed)
-                myPrint("Consumption:", sum(data_median_consumption) / len(data_median_consumption))
                 myPrint('Batteries state of charge reached the minimum level. Terminating script.')
             end(None, None)
         if args.maximum_soc != None and state_of_charge >= args.maximum_soc:
