@@ -25,5 +25,5 @@ python BatterySoCMonitor.py --sample_rate 60 -v -b --log_file battery_soc.log --
 - save results in log file (`battery_soc.log`)
 - terminate script and shutdown system at 10%
 ```
-python BatterySoCMonitor.py --sample_rate 60 -v -b --log_file battery_soc.log --minimum_soc 10 --cmd_end 'shutdown now'
+python BatterySoCMonitor.py --sample_rate 60 -v -b --log_file battery_soc.log --minimum_soc 10 --cmd_min_soc 'shutdown now'
 ```
