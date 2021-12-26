@@ -3,10 +3,10 @@ from datetime import datetime
 from math import floor
 from multiprocessing import Process
 import os
+from platform import system
 import psutil
 from signal import signal, SIGINT
 from sys import exit
-import sys
 from time import sleep, strftime, time, localtime
 
 script_version = '2.0.0'
@@ -150,8 +150,9 @@ def myPrint(*strings, sep=' ', end='\n'):
 
 
 def clear_previous_line():
-    sys.stdout.write("\033[F") # Cursor up one line
-    sys.stdout.write("\033[K") # Clear to the end of line
+    if system() == 'Linux':
+        print("\033[F", end='') # Cursor up one line
+        print("\033[K", end='') # Clear to the end of line
 
 
 def main():
@@ -232,7 +233,7 @@ def main():
         for wt in worker_threads:
             wt.start()
 
-    myPrint('# Please open an issue on Github if the script is not starting.')
+    myPrint()
     sample_counter = 0
     while True:
         time_now = time()
@@ -317,10 +318,15 @@ def end(signal_received, frame):
 
     if args.beautify:
         # Remove old output
-        clear_previous_line()
-        clear_previous_line()
-        clear_previous_line()
-        clear_previous_line()
+        if system() == 'Linux':
+            clear_previous_line()
+            clear_previous_line()
+            clear_previous_line()
+            clear_previous_line()
+        else:
+            myPrint()
+            myPrint()
+            myPrint()
 
         myPrint('# Script started at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_start)), 'with the following values:')
         myPrint()
@@ -345,8 +351,13 @@ def end(signal_received, frame):
         myPrint(percentage_to_human_form(median_consumption_end), '/ h')
     else:
         # Remove old output
-        clear_previous_line()
-        clear_previous_line()
+        if system() == 'Linux':
+            clear_previous_line()
+            clear_previous_line()
+        else:
+            myPrint()
+            myPrint()
+            myPrint()
 
         myPrint('# script_startet_at', floor(time_start), sep='\t')
         myPrint('# <sec>\t<soc>\t<until>\t<consumption>')
@@ -354,6 +365,8 @@ def end(signal_received, frame):
         myPrint(battery_soc_start, end='\t')
         myPrint(expected_remaining_time_start, end='\t')
         myPrint(median_consumption_start)
+
+        myPrint()
 
         myPrint('# script_terminated_at', floor(time_end), sep='\t')
         myPrint('# <sec>\t<soc>\t<until>\t<consumption>')
