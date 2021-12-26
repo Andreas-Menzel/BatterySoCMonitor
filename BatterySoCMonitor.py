@@ -129,8 +129,20 @@ def percentage_to_human_form(percent):
     return percent_str
 
 
-def myPrint(*strings, sep=' ', end='\n'):
+new_line = False
+def myPrint(*strings, sep=' ', end='\n', flush=False):
+    global new_line
+
     combined_string = ''
+    if new_line:
+        combined_string += '\n'
+
+    if end == '\n':
+        new_line = True
+        end = ''
+    else:
+        new_line = False
+
 
     if len(strings) > 1:
         for i in range(0, len(strings) - 1):
@@ -142,17 +154,24 @@ def myPrint(*strings, sep=' ', end='\n'):
     else:
         combined_string += end
 
-    print(combined_string, end='')
+    if flush:
+        if new_line:
+            combined_string += '\n'
+            new_line = False
+
+    print(combined_string, end='', flush=True)
 
     if args.log_file != None:
         with open(args.log_file, 'a+') as f:
             f.write(combined_string)
 
 
+
 def clear_previous_line():
     if system() == 'Linux':
         print("\033[F", end='') # Cursor up one line
         print("\033[K", end='') # Clear to the end of line
+
 
 
 def main():
@@ -256,7 +275,7 @@ def main():
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
-            clear_previous_line()
+            clear_current_line()
             if args.beautify:
                 myPrint(seconds_to_human_form(time_executed), end='\t')
                 myPrint(percentage_to_human_form(state_of_charge), end='\t')
@@ -377,6 +396,8 @@ def end(signal_received, frame):
 
     if args.verbose:
         myPrint('Goodbye!')
+
+    myPrint('', end='', flush=True)
     exit(0)
 
 
