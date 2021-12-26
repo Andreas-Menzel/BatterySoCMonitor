@@ -73,6 +73,8 @@ median_consumption_end = None
 data_soc = []
 data_secsleft = []
 data_median_consumption = []
+median_consumption_last_soc_change = None
+median_consumption_last_soc = None
 
 
 def worker_cpuLoad():
@@ -166,6 +168,8 @@ def main():
     global data_soc
     global data_secsleft
     global data_median_consumption
+    global median_consumption_last_soc
+    global median_consumption_last_soc_change
 
     # Initialize sample_rate and output_rate
     if args.sample_rate == None and args.output_rate == None:
@@ -241,20 +245,38 @@ def main():
         time_now = time()
         battery = psutil.sensors_battery()
         state_of_charge = round(battery.percent, 2)
+        data_soc.append(state_of_charge) # save data
+
         seconds_left = round(battery.secsleft)
+        data_secsleft.append(seconds_left) # save data
+
         time_executed = round(time_now - time_start)
         consumption = -1 # consumption in (% / s)
-        if sample_counter > 0:
-            consumption = (data_soc[0] - data_soc[-1]) / (time_executed / (60*60))
+        if sample_counter > 1:
+            if median_consumption_last_soc != None:
+                tmp_last_soc = median_consumption_last_soc
+            else:
+                median_consumption_last_soc = state_of_charge
+                tmp_last_soc = state_of_charge
+
+            if median_consumption_last_soc_change != None:
+                tmp_last_soc_change = median_consumption_last_soc_change
+            else:
+                median_consumption_last_soc_change = sample_counter
+                tmp_last_soc_change = sample_counter
+
+            if tmp_last_soc != state_of_charge:
+                tmp_last_soc_change = sample_counter
+                median_consumption_last_soc_change = sample_counter
+                median_consumption_last_soc = state_of_charge
+
+            consumption = (data_soc[0] - data_soc[tmp_last_soc_change]) / ((tmp_last_soc_change * args.sample_rate) / (60*60))
             consumption = round(consumption, 2)
 
         if median_consumption_start == 0 and consumption != 0 and consumption != -1:
             median_consumption_start = consumption
 
-        # save data
-        data_soc.append(state_of_charge)
-        data_secsleft.append(seconds_left)
-        data_median_consumption.append(consumption)
+        data_median_consumption.append(consumption) # save data
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
