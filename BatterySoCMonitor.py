@@ -3,10 +3,10 @@ from datetime import datetime
 from math import floor
 from multiprocessing import Process
 import os
+from platform import system
 import psutil
 from signal import signal, SIGINT
 from sys import exit
-import sys
 from time import sleep, strftime, time, localtime
 
 script_version = '2.0.0'
@@ -129,20 +129,8 @@ def percentage_to_human_form(percent):
     return percent_str
 
 
-new_line = False
-def myPrint(*strings, sep=' ', end='\n', flush=False):
-    global new_line
-
+def myPrint(*strings, sep=' ', end='\n'):
     combined_string = ''
-    if new_line:
-        combined_string += '\n'
-
-    if end == '\n':
-        new_line = True
-        end = ''
-    else:
-        new_line = False
-
 
     if len(strings) > 1:
         for i in range(0, len(strings) - 1):
@@ -154,22 +142,19 @@ def myPrint(*strings, sep=' ', end='\n', flush=False):
     else:
         combined_string += end
 
-    if flush:
-        if new_line:
-            combined_string += '\n'
-            new_line = False
-
-    print(combined_string, end='', flush=True)
+    print(combined_string, end='')
 
     if args.log_file != None:
         with open(args.log_file, 'a+') as f:
             f.write(combined_string)
 
 
-def clear_current_line():
-    global new_line
-    new_line = False
-    print('\r                                                                                                                                \r', end='')
+
+def clear_previous_line():
+    if system() == 'Linux':
+        print("\033[F", end='') # Cursor up one line
+        print("\033[K", end='') # Clear to the end of line
+
 
 
 def main():
@@ -250,7 +235,7 @@ def main():
         for wt in worker_threads:
             wt.start()
 
-    myPrint('# Please open an issue on Github if the script is not starting.')
+    myPrint()
     sample_counter = 0
     while True:
         time_now = time()
@@ -273,7 +258,7 @@ def main():
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
-            clear_current_line()
+            clear_previous_line()
             if args.beautify:
                 myPrint(seconds_to_human_form(time_executed), end='\t')
                 myPrint(percentage_to_human_form(state_of_charge), end='\t')
@@ -334,9 +319,16 @@ def end(signal_received, frame):
         os.system(args.cmd_end)
 
     if args.beautify:
-        myPrint()
-        myPrint()
-        myPrint()
+        # Remove old output
+        if system() == 'Linux':
+            clear_previous_line()
+            clear_previous_line()
+            clear_previous_line()
+            clear_previous_line()
+        else:
+            myPrint()
+            myPrint()
+            myPrint()
 
         myPrint('# Script started at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_start)), 'with the following values:')
         myPrint()
@@ -360,9 +352,14 @@ def end(signal_received, frame):
         myPrint(seconds_to_human_form(expected_remaining_time_end), end='\t')
         myPrint(percentage_to_human_form(median_consumption_end), '/ h')
     else:
-        myPrint()
-        myPrint()
-        myPrint()
+        # Remove old output
+        if system() == 'Linux':
+            clear_previous_line()
+            clear_previous_line()
+        else:
+            myPrint()
+            myPrint()
+            myPrint()
 
         myPrint('# script_startet_at', floor(time_start), sep='\t')
         myPrint('# <sec>\t<soc>\t<until>\t<consumption>')
@@ -370,6 +367,8 @@ def end(signal_received, frame):
         myPrint(battery_soc_start, end='\t')
         myPrint(expected_remaining_time_start, end='\t')
         myPrint(median_consumption_start)
+
+        myPrint()
 
         myPrint('# script_terminated_at', floor(time_end), sep='\t')
         myPrint('# <sec>\t<soc>\t<until>\t<consumption>')
@@ -381,7 +380,7 @@ def end(signal_received, frame):
     if args.verbose:
         myPrint('Goodbye!')
 
-    myPrint('', end='', flush=True)
+    myPrint('', end='')
     exit(0)
 
 
