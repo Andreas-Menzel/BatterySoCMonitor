@@ -129,20 +129,8 @@ def percentage_to_human_form(percent):
     return percent_str
 
 
-new_line = False
-def myPrint(*strings, sep=' ', end='\n', flush=False):
-    global new_line
-
+def myPrint(*strings, sep=' ', end='\n'):
     combined_string = ''
-    if new_line:
-        combined_string += '\n'
-
-    if end == '\n':
-        new_line = True
-        end = ''
-    else:
-        new_line = False
-
 
     if len(strings) > 1:
         for i in range(0, len(strings) - 1):
@@ -154,12 +142,7 @@ def myPrint(*strings, sep=' ', end='\n', flush=False):
     else:
         combined_string += end
 
-    if flush:
-        if new_line:
-            combined_string += '\n'
-            new_line = False
-
-    print(combined_string, end='', flush=True)
+    print(combined_string, end='')
 
     if args.log_file != None:
         with open(args.log_file, 'a+') as f:
@@ -275,7 +258,7 @@ def main():
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
-            clear_current_line()
+            clear_previous_line()
             if args.beautify:
                 myPrint(seconds_to_human_form(time_executed), end='\t')
                 myPrint(percentage_to_human_form(state_of_charge), end='\t')
@@ -397,7 +380,7 @@ def end(signal_received, frame):
     if args.verbose:
         myPrint('Goodbye!')
 
-    myPrint('', end='', flush=True)
+    myPrint('', end='')
     exit(0)
 
 
