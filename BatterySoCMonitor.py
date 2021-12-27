@@ -268,10 +268,10 @@ def main():
 
             tmp_first_soc = data_soc[median_consumption_first_soc_change]
             tmp_last_soc = data_soc[median_consumption_last_soc_change]
-            consumption = (tmp_first_soc - tmp_last_soc) / ((median_consumption_last_soc_change * args.sample_rate) / (60*60))
+            consumption = (tmp_first_soc - tmp_last_soc) / ((median_consumption_last_soc_change * args.sample_rate - median_consumption_first_soc_change * args.sample_rate) / (60*60))
             consumption = round(consumption, 2)
 
-            consumption_spp = (median_consumption_last_soc_change * args.sample_rate) / (tmp_first_soc - tmp_last_soc)
+            consumption_spp = (median_consumption_last_soc_change * args.sample_rate - median_consumption_first_soc_change * args.sample_rate) / (tmp_first_soc - tmp_last_soc)
             consumption_spp = round(consumption_spp)
         else:
             # initialize median_consumption_last_soc
