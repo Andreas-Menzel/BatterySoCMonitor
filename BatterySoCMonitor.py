@@ -9,7 +9,7 @@ from signal import signal, SIGINT
 from sys import exit
 from time import sleep, strftime, time, localtime
 
-script_version = '2.1.0'
+script_version = '2.1.1'
 
 # Setup argument parser
 parser = argparse.ArgumentParser(description='Simple python script that monitors the batteries state of charge', prog='BatterySoCMonitor')
@@ -355,8 +355,8 @@ def end(signal_received, frame):
     battery_soc_end = round(psutil.sensors_battery().percent)
     expected_remaining_time_end = round(psutil.sensors_battery().secsleft)
     time_end = time()
-    median_consumption_end = round((data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]) / (((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate) / (60*60)), 2)
-    median_consumption_spp_end = round(((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate) / (data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]))
+    median_consumption_end = round((data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]) / (((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate ) / (60*60)), 2)
+    median_consumption_spp_end = round(((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate   ) / (data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]))
 
     # stop all worker threads
     global worker_threads
