@@ -67,9 +67,9 @@ battery_soc_start = None
 battery_soc_end = None
 expected_remaining_time_start = None
 expected_remaining_time_end = None
-median_consumption_start = 0
+median_consumption_start = None
 median_consumption_end = None
-median_consumption_spp_start = 0
+median_consumption_spp_start = None
 median_consumption_spp_end = None
 
 data_soc = []
@@ -299,9 +299,9 @@ def main():
 
 
         # set first median_consumption
-        if median_consumption_start == 0 and consumption != -1:
+        if median_consumption_start == None and consumption != -1:
             median_consumption_start = consumption
-        if median_consumption_spp_start == 0 and consumption_spp != -1:
+        if median_consumption_spp_start == None and consumption_spp != -1:
             median_consumption_spp_start = consumption_spp
 
         data_median_consumption.append(consumption) # save data
@@ -355,8 +355,22 @@ def end(signal_received, frame):
     battery_soc_end = round(psutil.sensors_battery().percent)
     expected_remaining_time_end = round(psutil.sensors_battery().secsleft)
     time_end = time()
-    median_consumption_end = round((data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]) / (((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate ) / (60*60)), 2)
-    median_consumption_spp_end = round(((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate   ) / (data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]))
+
+    median_consumption_end = -1
+    median_consumption_spp_end = -1
+    if median_consumption_first_soc_change != None and median_consumption_last_soc_change != None:
+        median_consumption_end = round((data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]) / (((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate ) / (60*60)), 2)
+        median_consumption_spp_end = round(((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate   ) / (data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]))
+
+    if median_consumption_start == None:
+        median_consumption_start = -1
+    if median_consumption_end == None:
+        median_consumption_end = -1
+
+    if median_consumption_spp_start == None:
+        median_consumption_spp_start = -1
+    if median_consumption_spp_end == None:
+        median_consumption_spp_end = -1
 
     # stop all worker threads
     global worker_threads
