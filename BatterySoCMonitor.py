@@ -32,6 +32,8 @@ parser.add_argument('-b', '--beautify',
     help='Print information in human readable form')
 parser.add_argument('-l', '--log_file',
     metavar='',
+    nargs='?',
+    const='#NOT_SET#',
     help='Filename of the log-file')
 parser.add_argument('--minimum_soc',
     metavar='',
@@ -192,6 +194,9 @@ def main():
         if args.output_rate % args.sample_rate != 0:
             myPrint('ERROR: --output_rate must be a multiple of --sample_rate')
             end_error()
+
+    if args.log_file == '#NOT_SET#':
+        args.log_file = 'BatterySoCMonitor_' + str(datetime.now().strftime('%Y-%m-%d_%H-%M-%S')) + '_' + system() + '.log'
 
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
