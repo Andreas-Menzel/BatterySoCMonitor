@@ -387,11 +387,13 @@ def end(signal_received, frame):
         wt.terminate()
 
     # execute min_soc command
-    if args.cmd_min_soc != None:
-        os.system(args.cmd_min_soc)
+    if args.minimum_soc != None and battery_soc_end <= args.minimum_soc:
+        if args.cmd_min_soc != None:
+            os.system(args.cmd_min_soc)
     # execute max_soc command
-    if args.cmd_max_soc != None:
-        os.system(args.cmd_max_soc)
+    if args.maximum_soc != None and battery_soc_end >= args.maximum_soc:
+        if args.cmd_max_soc != None:
+            os.system(args.cmd_max_soc)
     # execute end command
     if args.cmd_end != None:
         os.system(args.cmd_end)
