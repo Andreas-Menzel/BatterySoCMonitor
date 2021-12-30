@@ -5,13 +5,13 @@ from datetime import datetime
 from math import floor
 from multiprocessing import Process
 import os
-from platform import system
+from platform import platform, system
 import psutil
 from signal import signal, SIGINT
 from sys import exit
 from time import sleep, strftime, time, localtime
 
-script_version = '2.1.1'
+script_version = '2.2.0'
 
 # Setup argument parser
 parser = argparse.ArgumentParser(description='Simple python script that monitors the batteries state of charge', prog='BatterySoCMonitor')
@@ -32,6 +32,8 @@ parser.add_argument('-b', '--beautify',
     help='Print information in human readable form')
 parser.add_argument('-l', '--log_file',
     metavar='',
+    nargs='?',
+    const='#NOT_SET#',
     help='Filename of the log-file')
 parser.add_argument('--minimum_soc',
     metavar='',
@@ -193,6 +195,9 @@ def main():
             myPrint('ERROR: --output_rate must be a multiple of --sample_rate')
             end_error()
 
+    if args.log_file == '#NOT_SET#':
+        args.log_file = 'BatterySoCMonitor_' + str(datetime.now().strftime('%Y-%m-%d_%H-%M-%S')) + '_' + system() + '.log'
+
     time_start = time()
     battery_soc_start = round(psutil.sensors_battery().percent)
     expected_remaining_time_start = round(psutil.sensors_battery().secsleft)
@@ -216,6 +221,7 @@ def main():
             myPrint('# cmd_start', '\t', ':\t', args.cmd_start, sep='')
             myPrint('# cmd_end', '\t', ':\t', args.cmd_end, sep='')
             myPrint('# workers', '\t', ':\t', args.workers, sep='')
+            myPrint('# OS', '\t\t' ':\t', platform(), sep='')
         else:
             myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
             myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
@@ -227,6 +233,7 @@ def main():
             myPrint('# cmd_start', ':', args.cmd_start, sep='\t')
             myPrint('# cmd_end', ':', args.cmd_end, sep='\t')
             myPrint('# workers', ':', args.workers, sep='\t')
+            myPrint('# OS', ':', platform(), sep='\t')
 
     if args.beautify:
         myPrint()
@@ -380,11 +387,13 @@ def end(signal_received, frame):
         wt.terminate()
 
     # execute min_soc command
-    if args.cmd_min_soc != None:
-        os.system(args.cmd_min_soc)
+    if args.minimum_soc != None and battery_soc_end <= args.minimum_soc:
+        if args.cmd_min_soc != None:
+            os.system(args.cmd_min_soc)
     # execute max_soc command
-    if args.cmd_max_soc != None:
-        os.system(args.cmd_max_soc)
+    if args.maximum_soc != None and battery_soc_end >= args.maximum_soc:
+        if args.cmd_max_soc != None:
+            os.system(args.cmd_max_soc)
     # execute end command
     if args.cmd_end != None:
         os.system(args.cmd_end)
