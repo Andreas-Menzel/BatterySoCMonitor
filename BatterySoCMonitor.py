@@ -493,7 +493,7 @@ def end(signal_received, frame):
         myPrint(median_consumption_sfb_end)
 
     if args.verbose:
-        myPrint('Goodbye!')
+        myPrint('# Goodbye!')
 
     myPrint('', end='')
     exit(0)
