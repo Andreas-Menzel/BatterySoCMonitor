@@ -242,7 +242,7 @@ def main():
 
     if args.beautify:
         myPrint()
-        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime/100%')
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime / 100%')
         myPrint('hh:mm:ss\t\thh:mm:ss\t(median)\t(median)')
         myPrint('---------\t-------\t---------\t-----------\t---------\t---------')
     else:
@@ -438,7 +438,7 @@ def end(signal_received, frame):
 
         myPrint('# Script started at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_start)), 'with the following values:')
         myPrint()
-        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime/100%')
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime / 100%')
         myPrint('hh:mm:ss\t\thh:mm:ss\t(median)\t(median)')
         myPrint('---------\t-------\t---------\t-----------\t---------\t---------')
         myPrint(seconds_to_human_form(0), end='\t')
@@ -452,7 +452,7 @@ def end(signal_received, frame):
 
         myPrint('# Script terminated at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_end)), 'with the following values:')
         myPrint()
-        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime/100%')
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime / 100%')
         myPrint('hh:mm:ss\t\thh:mm:ss\t(median)\t(median)')
         myPrint('---------\t-------\t---------\t-----------\t---------\t---------')
         myPrint(seconds_to_human_form(round(time_end - time_start)), end='\t')
