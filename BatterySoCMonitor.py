@@ -274,7 +274,7 @@ def main():
         time_executed = round(time_now - time_start)
 
         consumption = -1 # consumption in (% / s)
-        consumption_spp = -1 # consumption in (min / %)
+        consumption_spp = -1 # consumption in (sec / %)
         consumption_sfb = -1 # consumption in (sec / 100%)
         if median_consumption_last_soc != None and median_consumption_first_soc_change != None and median_consumption_last_soc_change != None:
             if median_consumption_last_soc != state_of_charge:
