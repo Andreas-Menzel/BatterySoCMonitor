@@ -226,7 +226,9 @@ def main():
             myPrint('# cmd_start', '\t', ':\t', args.cmd_start, sep='')
             myPrint('# cmd_end', '\t', ':\t', args.cmd_end, sep='')
             myPrint('# workers', '\t', ':\t', args.workers, sep='')
+            myPrint('#')
             myPrint('# OS', '\t\t' ':\t', platform(), sep='')
+            myPrint('# time_started', '\t', ':\t', str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')), sep='')
         else:
             myPrint('# sample_rate', '\t', ':\t', args.sample_rate, sep='')
             myPrint('# output_rate', '\t', ':\t', args.output_rate, sep='')
@@ -238,7 +240,9 @@ def main():
             myPrint('# cmd_start', ':', args.cmd_start, sep='\t')
             myPrint('# cmd_end', ':', args.cmd_end, sep='\t')
             myPrint('# workers', ':', args.workers, sep='\t')
+            myPrint('#')
             myPrint('# OS', ':', platform(), sep='\t')
+            myPrint('# time_started', '\t', ':\t', round(time()), sep='')
 
     if args.beautify:
         myPrint()
