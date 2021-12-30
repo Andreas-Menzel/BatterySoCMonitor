@@ -75,11 +75,14 @@ median_consumption_start = None
 median_consumption_end = None
 median_consumption_spp_start = None
 median_consumption_spp_end = None
+median_consumption_sfb_start = None
+median_consumption_sfb_end = None
 
 data_soc = []
 data_secsleft = []
 data_median_consumption = [] # % / h
 data_median_consumption_spp = [] # min / %
+data_median_consumption_sfb = [] # sec / 100%
 median_consumption_first_soc_change = None
 median_consumption_last_soc_change = None
 median_consumption_last_soc = None
@@ -174,10 +177,12 @@ def main():
     global expected_remaining_time_start
     global median_consumption_start
     global median_consumption_spp_start
+    global median_consumption_sfb_start
     global data_soc
     global data_secsleft
     global data_median_consumption
     global data_median_consumption_spp
+    global data_median_consumption_sfb
     global median_consumption_last_soc
     global median_consumption_first_soc_change
     global median_consumption_last_soc_change
@@ -237,12 +242,12 @@ def main():
 
     if args.beautify:
         myPrint()
-        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %')
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime / 100%')
         myPrint('hh:mm:ss\t\thh:mm:ss\t(median)\t(median)')
-        myPrint('---------\t-------\t---------\t-----------\t---------')
+        myPrint('---------\t-------\t---------\t-----------\t---------\t---------')
     else:
         myPrint()
-        myPrint('# <sec>\t<soc>\t<until>\t<cons>\t<sec/%>')
+        myPrint('# <sec>\t<soc>\t<until>\t<cons>\t<sec/%>\t<sec/100%>')
 
     time_start = time()
 
@@ -270,6 +275,7 @@ def main():
 
         consumption = -1 # consumption in (% / s)
         consumption_spp = -1 # consumption in (min / %)
+        consumption_sfb = -1 # consumption in (sec / 100%)
         if median_consumption_last_soc != None and median_consumption_first_soc_change != None and median_consumption_last_soc_change != None:
             if median_consumption_last_soc != state_of_charge:
                 median_consumption_last_soc_change = sample_counter
@@ -282,6 +288,9 @@ def main():
 
             consumption_spp = (median_consumption_last_soc_change * args.sample_rate - median_consumption_first_soc_change * args.sample_rate) / (tmp_first_soc - tmp_last_soc)
             consumption_spp = round(consumption_spp)
+            
+            consumption_sfb = ((median_consumption_last_soc_change * args.sample_rate - median_consumption_first_soc_change * args.sample_rate) / (tmp_first_soc - tmp_last_soc)) * 100
+            consumption_sfb = round(consumption_sfb)
         else:
             # initialize median_consumption_last_soc
             if median_consumption_last_soc == None:
@@ -306,14 +315,20 @@ def main():
                 consumption_spp = (median_consumption_first_soc_change * args.sample_rate) / (data_soc[0] - data_soc[median_consumption_first_soc_change])
                 consumption_spp = round(consumption_spp)
 
+                consumption_sfb = ((median_consumption_first_soc_change * args.sample_rate) / (data_soc[0] - data_soc[median_consumption_first_soc_change])) * 100
+                consumption_sfb = round(consumption_sfb)
+
 
         # set first median_consumption
         if median_consumption_start == None and consumption != -1:
             median_consumption_start = consumption
         if median_consumption_spp_start == None and consumption_spp != -1:
             median_consumption_spp_start = consumption_spp
+        if median_consumption_sfb_start == None and consumption_sfb != -1:
+            median_consumption_sfb_start = consumption_sfb
 
         data_median_consumption.append(consumption) # save data
+        data_median_consumption_sfb.append(consumption_sfb) # save data
 
         # print data (to console [and file])
         if sample_counter % (args.output_rate / args.sample_rate) == 0:
@@ -323,13 +338,15 @@ def main():
                 myPrint(percentage_to_human_form(state_of_charge), end='\t')
                 myPrint(seconds_to_human_form(seconds_left), end='\t')
                 myPrint(percentage_to_human_form(consumption), '/ h', end='\t')
-                myPrint(seconds_to_human_form(consumption_spp))
+                myPrint(seconds_to_human_form(consumption_spp), end='\t')
+                myPrint(seconds_to_human_form(consumption_sfb))
             else:
                 myPrint(time_executed, end='\t')
                 myPrint(state_of_charge, end='\t')
                 myPrint(seconds_left, end='\t')
                 myPrint(consumption, end='\t')
-                myPrint(consumption_spp)
+                myPrint(consumption_spp, end='\t')
+                myPrint(consumption_sfb)
 
         # check if minimum_soc or maximum_soc is reached
         if args.minimum_soc != None and state_of_charge <= args.minimum_soc:
@@ -360,6 +377,8 @@ def end(signal_received, frame):
     global median_consumption_end
     global median_consumption_spp_start
     global median_consumption_spp_end
+    global median_consumption_sfb_start
+    global median_consumption_sfb_end
 
     battery_soc_end = round(psutil.sensors_battery().percent)
     expected_remaining_time_end = round(psutil.sensors_battery().secsleft)
@@ -367,9 +386,11 @@ def end(signal_received, frame):
 
     median_consumption_end = -1
     median_consumption_spp_end = -1
+    median_consumption_sfb_end = -1
     if median_consumption_first_soc_change != None and median_consumption_last_soc_change != None:
         median_consumption_end = round((data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]) / (((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate ) / (60*60)), 2)
         median_consumption_spp_end = round(((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate   ) / (data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change]))
+        median_consumption_sfb_end = round((((median_consumption_last_soc_change - median_consumption_first_soc_change) * args.sample_rate   ) / (data_soc[median_consumption_first_soc_change] - data_soc[median_consumption_last_soc_change])) * 100)
 
     if median_consumption_start == None:
         median_consumption_start = -1
@@ -380,6 +401,11 @@ def end(signal_received, frame):
         median_consumption_spp_start = -1
     if median_consumption_spp_end == None:
         median_consumption_spp_end = -1
+
+    if median_consumption_sfb_start == None:
+        median_consumption_sfb_start = -1
+    if median_consumption_sfb_end == None:
+        median_consumption_sfb_end = -1
 
     # stop all worker threads
     global worker_threads
@@ -412,27 +438,29 @@ def end(signal_received, frame):
 
         myPrint('# Script started at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_start)), 'with the following values:')
         myPrint()
-        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %')
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime / 100%')
         myPrint('hh:mm:ss\t\thh:mm:ss\t(median)\t(median)')
-        myPrint('---------\t-------\t---------\t-----------\t---------')
+        myPrint('---------\t-------\t---------\t-----------\t---------\t---------')
         myPrint(seconds_to_human_form(0), end='\t')
         myPrint(percentage_to_human_form(battery_soc_start), end='\t')
         myPrint(seconds_to_human_form(expected_remaining_time_start), end='\t')
         myPrint(percentage_to_human_form(median_consumption_start), '/ h', end='\t')
-        myPrint(seconds_to_human_form(median_consumption_spp_start))
+        myPrint(seconds_to_human_form(median_consumption_spp_start), end='\t')
+        myPrint(seconds_to_human_form(median_consumption_sfb_start))
 
         myPrint()
 
         myPrint('# Script terminated at', strftime("%d.%m.%Y %H:%M:%S", localtime(time_end)), 'with the following values:')
         myPrint()
-        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %')
+        myPrint('timeExecuted\tbat %\ttimeRemaining\tconsumption\ttime / %\ttime / 100%')
         myPrint('hh:mm:ss\t\thh:mm:ss\t(median)\t(median)')
-        myPrint('---------\t-------\t---------\t-----------\t---------')
+        myPrint('---------\t-------\t---------\t-----------\t---------\t---------')
         myPrint(seconds_to_human_form(round(time_end - time_start)), end='\t')
         myPrint(percentage_to_human_form(battery_soc_end), end='\t')
         myPrint(seconds_to_human_form(expected_remaining_time_end), end='\t')
         myPrint(percentage_to_human_form(median_consumption_end), '/ h', end='\t')
-        myPrint(seconds_to_human_form(median_consumption_spp_end), '/ h')
+        myPrint(seconds_to_human_form(median_consumption_spp_end), '/ h', end='\t')
+        myPrint(seconds_to_human_form(median_consumption_sfb_end))
     else:
         # Remove old output
         if system() == 'Linux':
@@ -444,22 +472,24 @@ def end(signal_received, frame):
             myPrint()
 
         myPrint('# script_startet_at', floor(time_start), sep='\t')
-        myPrint('# <sec>\t<soc>\t<until>\t<cons>\t<sec/%>')
+        myPrint('# <sec>\t<soc>\t<until>\t<cons>\t<sec/%>\t<sec/100%>')
         myPrint(0, end='\t')
         myPrint(battery_soc_start, end='\t')
         myPrint(expected_remaining_time_start, end='\t')
         myPrint(median_consumption_start, end='\t')
-        myPrint(median_consumption_spp_start)
+        myPrint(median_consumption_spp_start, end='\t')
+        myPrint(median_consumption_sfb_start)
 
         myPrint()
 
         myPrint('# script_terminated_at', floor(time_end), sep='\t')
-        myPrint('# <sec>\t<soc>\t<until>\t<cons>\t<sec/%>')
+        myPrint('# <sec>\t<soc>\t<until>\t<cons>\t<sec/%>\t<sec/100%>')
         myPrint(round(time_end - time_start), end='\t')
         myPrint(battery_soc_end, end='\t')
         myPrint(expected_remaining_time_end, end='\t')
         myPrint(median_consumption_end, end='\t')
-        myPrint(median_consumption_spp_end)
+        myPrint(median_consumption_spp_end, end='\t')
+        myPrint(median_consumption_sfb_end)
 
     if args.verbose:
         myPrint('Goodbye!')
