@@ -288,7 +288,7 @@ def main():
 
             consumption_spp = (median_consumption_last_soc_change * args.sample_rate - median_consumption_first_soc_change * args.sample_rate) / (tmp_first_soc - tmp_last_soc)
             consumption_spp = round(consumption_spp)
-            
+
             consumption_sfb = ((median_consumption_last_soc_change * args.sample_rate - median_consumption_first_soc_change * args.sample_rate) / (tmp_first_soc - tmp_last_soc)) * 100
             consumption_sfb = round(consumption_sfb)
         else:
@@ -328,6 +328,7 @@ def main():
             median_consumption_sfb_start = consumption_sfb
 
         data_median_consumption.append(consumption) # save data
+        data_median_consumption_spp.append(consumption) # save data
         data_median_consumption_sfb.append(consumption_sfb) # save data
 
         # print data (to console [and file])
