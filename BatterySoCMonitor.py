@@ -460,7 +460,7 @@ def end(signal_received, frame):
         myPrint(percentage_to_human_form(battery_soc_end), end='\t')
         myPrint(seconds_to_human_form(expected_remaining_time_end), end='\t')
         myPrint(percentage_to_human_form(median_consumption_end), '/ h', end='\t')
-        myPrint(seconds_to_human_form(median_consumption_spp_end), '/ h', end='\t')
+        myPrint(seconds_to_human_form(median_consumption_spp_end), end='\t')
         myPrint(seconds_to_human_form(median_consumption_sfb_end))
     else:
         # Remove old output
