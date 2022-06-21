@@ -88,12 +88,24 @@ median_consumption_last_soc_change = None
 median_consumption_last_soc = None
 
 
+# worker_cpuLoad
+#
+# Performs a calculation to occupy the CPU. 
+#
+# @return   None
 def worker_cpuLoad():
     x = 123
     while True:
         x*x
 
 
+# seconds_to_human_form
+#
+# Transforms the specified time to human readable form.
+#
+# @param    int     seconds     Seconds.
+#
+# @return   Returns the specified time in human readable form
 def seconds_to_human_form(seconds):
     if seconds < 0:
         return '00:00:00?'
@@ -122,6 +134,13 @@ def seconds_to_human_form(seconds):
     return hours_str  + ':' + minutes_str + ':' + seconds_str
 
 
+# percentage_to_human_form
+#
+# Transforms the specified percentage to fixed length string.
+#
+# @param    float   percent     Percent.
+#
+# @return   Returns the specified percentage as fixed length string.
 def percentage_to_human_form(percent):
     percent_0 = floor(percent)
     percent_1 = int((percent - percent_0) * 100)
@@ -141,7 +160,15 @@ def percentage_to_human_form(percent):
 
     return percent_str
 
-
+# my_print
+#
+# Prints text to the console and to a log-file if supplied.
+#
+# @param    [string]    strings     Strings to print and save.
+# @param    string      sep         Separator to be added between the strings.
+# @param    string      end         End.
+#
+# @return   None
 def myPrint(*strings, sep=' ', end='\n'):
     combined_string = ''
 
@@ -162,14 +189,22 @@ def myPrint(*strings, sep=' ', end='\n'):
             f.write(combined_string)
 
 
-
+# clear_previous_line
+#
+# Clears the previous line in the terminal if on Linux.
+#
+# @return   None
 def clear_previous_line():
     if system() == 'Linux':
         print("\033[F", end='') # Cursor up one line
         print("\033[K", end='') # Clear to the end of line
 
 
-
+# main
+#
+# Main function.
+#
+# @return   None
 def main():
     global worker_threads
     global time_start
@@ -371,6 +406,15 @@ def main():
 def end_error():
     exit(1)
 
+    
+# end
+#
+# Prints summary and terminates script.
+#
+# @param    int         signal_received     Signal.
+# @param    FrameType   frame               Frame.
+#
+# @return   None
 def end(signal_received, frame):
     global time_start
     global time_end
