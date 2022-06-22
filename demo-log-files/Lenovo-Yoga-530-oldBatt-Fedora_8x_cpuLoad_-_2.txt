@@ -1,0 +1,22 @@
+### BatterySoCMonitor version 1.1.0
+# delay		:	10
+# verbose	:	True
+# beautify	:	True
+# log_file	:	log_file/Lenovo-Yoga-530-oldBatt-Fedora_8x_cpuLoad_-_2.txt
+# minimum_soc	:	15
+# maximum_soc	:	None
+# cmd_start	:	None
+# cmd_end	:	shutdown now
+# workers	:	['cpuLoad', 'cpuLoad', 'cpuLoad', 'cpuLoad', 'cpuLoad', 'cpuLoad', 'cpuLoad', 'cpuLoad']
+
+timeExecuted	bat %	timeRemaining
+hh:mm:ss		hh:mm:ss
+---------	-------	---------
+00:00:00	100.00%	16:51:23
+00:00:10	100.34%	00:34:57
+00:00:20	  0.00%	00:00:00
+Batteries state of charge reached the minimum level. Terminating script.
+
+# Script started at 18.12.2021 06:51:54 with 100% and expected runtime of 16:51:23.
+# Script terminated at 18.12.2021 06:52:14 with 0% and expected runtime of 00:00:00.
+Goodbye!
