@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
 
+#-------------------------------------------------------------------------------
+# BatterySoCMonitor
+#
+# Monitor the batteries state of charge and approximate the total battery
+#     capacity in hours.
+#
+# https://github.com/Andreas-Menzel/BatterySoCMonitor
+#-------------------------------------------------------------------------------
+# @author: Andreas Menzel
+# @license: MIT License
+# @copyright: Copyright (c) 2021 Andreas Menzel
+#-------------------------------------------------------------------------------
+
 import argparse
 from datetime import datetime
 from math import floor
@@ -90,7 +103,7 @@ median_consumption_last_soc = None
 
 # worker_cpuLoad
 #
-# Performs a calculation to occupy the CPU. 
+# Performs a calculation to occupy the CPU.
 #
 # @return   None
 def worker_cpuLoad():
@@ -406,7 +419,7 @@ def main():
 def end_error():
     exit(1)
 
-    
+
 # end
 #
 # Prints summary and terminates script.
