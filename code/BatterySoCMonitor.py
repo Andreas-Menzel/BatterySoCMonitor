@@ -24,10 +24,10 @@ from signal import signal, SIGINT
 from sys import exit
 from time import sleep, strftime, time, localtime
 
-script_version = '2.3.0'
+script_version = '2.3.1'
 
 # Setup argument parser
-parser = argparse.ArgumentParser(description='Simple python script that monitors the batteries state of charge', prog='BatterySoCMonitor')
+parser = argparse.ArgumentParser(description='Monitor the batteries state of charge and approximate the total battery capacity in hours.', prog='BatterySoCMonitor')
 parser.add_argument('--version', action='version', version='%(prog)s ' + script_version)
 parser.add_argument('--sample_rate',
     metavar='',
